@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>音乐播放器</title>
+		<style type="text/css">
+			body,p{
+				margin:0;
+				padding:0;
+			}
+			a{
+				text-decoration: none;
+			}
+			.bg{
+				background:-webkit-gradient(linear,0% 0%,100% 100%,from(#5520b8),to(#bc23b7));
+				box-shadow:5px 5px 10px #000;
+				margin: 30px auto;
+				width:90%;
+				height:654px;
+				padding-top:110px ;
+				position: relative;
+			}
+			.content{
+				float:left;
+				margin-left: 150px;
+				position: relative;
+			}
+			.control{
+				position: absolute;
+				left:336px;
+				top:-10px;
+				transform: rotate(-18deg);
+				transform-origin : 58px 25px;
+			}
+			.person{
+				border-radius: 50%;
+				position: absolute;
+				width:200px;
+				top:85px;
+				left:85px;
+			}
+			.name{
+				height: 60px;
+				margin:5px auto;
+				line-height: 60px;
+				font-size: 60px;
+				font-weight: 600px;
+				text-align: center;
+				color:#fff;
+				
+			}
+			.flex{
+				display: flex;
+				justify-content: center;
+			}
+			.author{
+				font-size: 16px;
+			}
+			.special{
+				font-size: 14px;
+				margin-left:10px ;
+			}
+			.right{
+				width: 400px;
+				position: relative;
+			}
+			/*按钮bar*/
+			@font-face {
+		      font-family: 'fontbar';
+		      src: url('./iconfont/iconfont.woff') format('woff'),
+		           url('./iconfont/iconfont.ttf') format('truetype');
+		    }
+		    .bar{
+		    	font-family: "fontbar";
+		    	color: #fff;
+		    	font-size: 16px;
+		    	font-weight: 500;
+		    	margin:0 10px;
+		    	text-decoration: none;
+		    }
+		    .contorlMenu{
+		    	overflow: hidden;
+		    	padding-top: 50px;
+		    	
+		    }
+		    .start{float: left;}
+		    .vol{float:right;}
+		    .time-box{
+		    	margin-top:50px;
+		    }
+		    .time{
+		    	color: #fff;
+		    	font-size: 12px;
+		    	float:left;
+		    }
+		    .progress-box{
+		    	float: right;
+		    	width:340px;
+		    	height: 8px;
+		    	margin-top: 5px;
+		    	border-radius: 4px;
+		    	background:rgba(102,102,102,.6) 
+		    }
+		    /*人物旋转*/
+		    @-webkit-keyframes cdrotation{
+		    	from{
+		    		transform: rotate(0deg);
+		    	}
+		    	to{
+		    		transform: rotate(360deg);
+		    	}
+		    }
+		    /*播放*/
+		    @-webkit-keyframes play{
+		    	from{
+		    		transform: rotate(-18deg);
+		    	}
+		    	to{
+		    		transform: rotate(0deg);
+		    	}
+		    }
+		    /*暂停*/
+		     @-webkit-keyframes stop{
+		    	from{
+		    		transform: rotate(0deg);
+		    	}
+		    	to{
+		    		transform: rotate(-18deg);
+		    	}
+		    }
+		    .play{
+		    	animation: play 0.5s linear ;
+		    	animation-fill-mode: forwards;
+		    }
+		    .stop{
+		    	animation: stop 0.5s linear ;
+		    	animation-fill-mode: forwards;
+		    }
+		    .turn{
+		    	animation: cdrotation 5s linear infinite;
+		    }
+		    .progress{
+		    	width:0%;
+		    	border-radius: 4px;
+		    	background-color: #fff;
+		    	height: 100%;
+		    }
+		    .song-name{
+		    	font-size: 30px;
+		    	color: #fff;
+		    	font-weight:100;
+		    	text-align: center;
+		    }
+		    footer{
+		    	position: absolute;
+		    	bottom:20px;
+		    	left:18%;
+		    }
+		    .list{
+		    	list-style: none;
+		    	display: flex;
+		    }
+		    .list li{
+		    	margin: 0 10px;
+		    	border-radius: 10px;
+		    	background:#8940b2;
+		    	padding:15px 20px;
+		    }
+		    .author_bottom{
+		    	font-size: 16px;
+		    	color: #fff;
+		    }
+		    .special_bottom{
+		    	font-size: 14px;
+		    	color: #fff;
+		    }
+		    #controlVoice{
+		    	transform: rotate(-90deg);
+		    	position: absolute;
+		    	top:104px;
+		    	right: -48px;
+		    	display: none;
+		    }
+		</style>
+		<script src="js/jquery.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			onload = function(){
+				var songList = [{name:"丑八怪",src:"music/丑八怪 - 薛之谦.mp3"},{name:"认真的雪",src:"music/认真的雪 - 薛之谦.mp3"}
+								,{name:"绅士",src:"music/绅士 - 薛之谦.mp3"},{name:"演员",src:"music/演员 - 薛之谦.mp3"},{name:"一半",src:"music/一半 - 薛之谦.mp3"}]
+				var audio = document.getElementsByTagName("audio")[0];
+				var contorlMenu = document.getElementById("contorlMenu");
+				var flag = false;
+				var num = 0;
+				contorlMenu.addEventListener("click",function(e){
+					var start = document.getElementById("start");
+					var stop = document.getElementById("stop");
+					var e = e || window.event;
+					if(e.target.id == "start"){
+						audio.play();
+						start.style.display = "none";
+						stop.style.display = "inline-block";
+						$("#control").removeClass("stop");
+						$("#control").toggleClass("play");
+						if(!flag){
+							$("#person").toggleClass("turn");
+						}else{
+							console.log(1)
+							$("#person").css("animation-play-state","running");
+						}
+						console.log(audio.duration);
+						//时间
+						songTime();
+					}else if(e.target.id == "stop"){
+						audio.pause();
+						stop.style.display = "none";
+						start.style.display = "inline-block";
+						$("#control").removeClass("play");
+						$("#control").toggleClass("stop");
+						$("#person").css("animation-play-state","paused");
+						flag = true;
+					}else if(e.target.id == "next"){//下一曲
+						num++;
+						changeSong(songList[num]);
+						if(num==4){
+							num= 0;
+						}
+					}else if(e.target.id == "back"){
+						num--;
+						if(num<=0){
+							num=4;
+						}
+						changeSong(songList[num]);
+					}else if(e.target.id== "voice"){
+						$("#controlVoice").show(700);
+					}
+				},false);
+				//时间进度条
+				function songTime(){
+					var totalTime = audio.duration;
+					$("#totalTime").html(timeUtil(totalTime));
+					var timer = setInterval(function(){
+						//$("#progress").css("width",);
+						$("#progress").animate({width:(audio.currentTime/totalTime*100).toFixed()+"%"})
+						$("#nowTime").html(timeUtil(audio.currentTime));
+						if(nowTime >= totalTime){
+							clearInterval(timer);
+							audio.pause();
+						}
+					},1000)
+				}
+				function timeUtil(data){
+					return Math.floor(data/60)+":"+(data%60/100).toFixed(2).slice(-2);
+				}
+				//切换歌曲
+				function changeSong(obj) {
+					$("#progress").css("width","0");
+					songTime();
+					$("#songName").html(obj.name);
+					$("audio").attr("src",obj.src);
+					//探头
+					$("#person").addClass("turn");
+					$("#control").addClass("play");
+					audio.play();
+				}
+				//点击歌曲列表
+				$("li").click(function(){
+					//console.log($(this).index())
+					changeSong(songList[$(this).index()]);
+				})
+				//随机播放
+				$("#random").click(function(){
+					var random = Math.round(Math.random()*3);
+					while(num == random){
+						random = Math.round(Math.random()*3);
+					}
+					num = random;
+					changeSong(songList[num]);
+				})
+				//重新播放
+				$("#loop").click(function(){
+					$("#progress").css("width","0%");
+					audio.load();
+					audio.play();
+				})
+				//隐藏音量调节器
+				$("#controlVoice").mouseleave(function(){
+					$(this).hide(100);
+				})
+				//改变音量
+				$("#controlVoice").change(function(){
+					audio.volume = $(this).val();
+				});
+			}
+		</script>
+	</head>
+	<body>
+		<audio src="music/演员 - 薛之谦.mp3" ></audio>
+		<section class="bg">
+			<section class="content left">
+				<img src="img/cd.png" class="cd"/>
+				<img src="img/cd_tou.png" class="control" id="control"/>
+				<img src="img/img.jpg" class="person" id="person"/>
+			</section>
+			<section class="content right">
+				<p class="name" id="songName">演员</p>
+				<p class="name flex">
+					<span class="author">薛之谦</span>
+					<span class="special">专辑:绅士</span>
+				</p>
+				<section class="contorlMenu" id="contorlMenu">
+					<div class="start">
+						<a id="back" class="bar" href="javascript:;">&#xe503;</a>
+						<a id="start" class="bar" href="javascript:;" >&#xe607;</a>
+						<a id="stop" class="bar" href="javascript:;" style="display: none;">&#xe608;</a>
+						<a id="next" class="bar" href="javascript:;">&#xe615;</a>
+					</div>
+					<div class="vol">
+						<a id="random" class="bar" href="javascript:;">&#xe630;</a>
+						<a id="loop"  class="bar" href="javascript:;">&#xe611;</a>
+						<a id="voice" class="bar" href="javascript:;">&#xe616;</a>
+					</div>
+						<input type="range" max="1" min="0" step="0.1" id="controlVoice"/>
+				</section>
+				<section class="time-box">
+					<span class="time" id="nowTime">0:00</span>
+					<span class="time">/</span>
+					<span class="time" id="totalTime">3:31</span>
+					<div class="progress-box">
+						<div class="progress" id="progress">
+							
+						</div>
+					</div>
+				</section>
+			</section>
+			<footer>
+				<ul class="list">
+					<li>
+						<a href="javascript:;">
+							<p class="song-name">丑八怪</p>
+							<p class="">
+								<span class="author_bottom">薛之谦</span>
+								<span class="special_bottom">专辑:绅士</span>
+							</p>
+						</a>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<p class="song-name">认真的雪</p>
+							<p class="">
+								<span class="author_bottom">薛之谦</span>
+								<span class="special_bottom">专辑:绅士</span>
+							</p>
+						</a>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<p class="song-name">绅士</p>
+							<p class="">
+								<span class="author_bottom">薛之谦</span>
+								<span class="special_bottom">专辑:绅士</span>
+							</p>
+						</a>
+					</li>
+					<li>
+						<a href="javascript:;">
+							<p class="song-name">演员</p>
+							<p class="">
+								<span class="author_bottom">薛之谦</span>
+								<span class="special_bottom">专辑:绅士</span>
+							</p>
+						</a>
+					</li>
+				</ul>
+			</footer>
+		</section>
+	</body>
+</html>
